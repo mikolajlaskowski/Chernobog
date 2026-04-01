@@ -1,4 +1,13 @@
-import {Client, Collection, Events, GatewayIntentBits, InteractionReplyOptions, MessageFlags} from 'discord.js';
+import {
+    CacheType,
+    Client,
+    Collection,
+    Events,
+    GatewayIntentBits,
+    Interaction,
+    InteractionReplyOptions,
+    MessageFlags
+} from 'discord.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import * as dotenv from 'dotenv';
@@ -17,16 +26,16 @@ const client = new Client({
 
 client.commands = new Collection<string, Command>();
 
-const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath);
-const ext = __filename.endsWith('.ts') ? '.ts' : '.js';
+const foldersPath: string = path.join(__dirname, 'commands');
+const commandFolders: string[] = fs.readdirSync(foldersPath);
+const ext: ".ts" | ".js" = __filename.endsWith('.ts') ? '.ts' : '.js';
 
 for (const folder of commandFolders) {
-    const commandsPath = path.join(foldersPath, folder);
-    const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith(ext));
+    const commandsPath: string = path.join(foldersPath, folder);
+    const commandFiles: string[] = fs.readdirSync(commandsPath).filter(file => file.endsWith(ext));
 
     for (const file of commandFiles) {
-        const filePath = path.join(commandsPath, file);
+        const filePath: string = path.join(commandsPath, file);
         const command: Command = require(filePath).default;
 
         if ('data' in command && 'execute' in command) {
@@ -37,14 +46,14 @@ for (const folder of commandFolders) {
     }
 }
 
-client.once(Events.ClientReady, (c): void => {
-    console.log(`Přihlášen jako ${c.user.tag}`);
+client.once(Events.ClientReady, (readyClient: Client<true>): void => {
+    console.log(`Přihlášen jako ${readyClient.user.tag}`);
 });
 
-client.on(Events.InteractionCreate, async (interaction): Promise<void> => {
+client.on(Events.InteractionCreate, async (interaction: Interaction<CacheType>): Promise<void> => {
     if (!interaction.isChatInputCommand()) return;
 
-    const command = interaction.client.commands.get(interaction.commandName);
+    const command: Command | undefined = interaction.client.commands.get(interaction.commandName);
 
     if (!command) {
         console.error(`Příkaz ${interaction.commandName} nebyl nalezen.`);

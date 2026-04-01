@@ -35,7 +35,7 @@ for (const folder of commandFolders) {
     }
 }
 
-const rest = new REST().setToken(token);
+const rest: REST = new REST().setToken(token);
 
 async function deploy(): Promise<void> {
     try {
